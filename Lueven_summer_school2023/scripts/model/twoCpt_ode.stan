@@ -1,7 +1,13 @@
 
 functions {
-  vector system(real time, vector y, array[] real theta,
-                array[] real x_r, array[] int x_i) {
+  vector system(
+    real time,           # time at which the ODE is evaluated
+    vector y,            # state (or solution) of the ODE
+    array[] real theta,  # parameters of the ODE
+    array[] real x_r,    # real coefficient
+    array[] int x_i      # int coefficient
+    ) {
+      
     real CL = theta[1];
     real Q = theta[2];
     real VC = theta[3];
@@ -18,11 +24,13 @@ functions {
 }
 
 data {
+  real tol;
   int<lower = 1> nEvent;
   int<lower = 1> nObs;
   array[nObs] int<lower = 1> iObs;
 
-  // Event schedule
+  // Event schedule - all of these covariates together encode the dosing 
+  // of the drug given to the patient
   array[nEvent] int<lower = 1> cmt;
   array[nEvent] int evid;
   array[nEvent] int addl;
@@ -41,8 +49,8 @@ transformed data {
   int nCmt = 3;
   
   // NOTE: optional control parameters for pmx_solve_rk45.
-  real rel_tol = 1e-2;
-  real abs_tol = 1e-2;
+  real rel_tol = tol;
+  real abs_tol = tol;
   real rel_tol_IS = 1e-10;
   real abs_tol_IS = 1e-10;
   int max_num_steps = 1000;
